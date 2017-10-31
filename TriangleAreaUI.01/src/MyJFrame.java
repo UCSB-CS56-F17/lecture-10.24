@@ -30,6 +30,13 @@ import javax.swing.plaf.FontUIResource;
 
 public class MyJFrame extends JFrame implements ActionListener {
 
+	// Three ways to add an ActionListner
+	// (1) separate class
+	// (2) inner class
+	// (3) make yourself the action listener
+	//      "implements ActionListener" right after
+	//      "public class MyJFrame extends JFrame..." is method (3)
+	
 	public static void main(String [] args) {
 		System.out.println("This is the main of MyJFrame");
 		MyJFrame j = new MyJFrame();
@@ -46,6 +53,7 @@ public class MyJFrame extends JFrame implements ActionListener {
 	
 	public void actionPerformed(ActionEvent e) {
 		System.out.println("I am my own ActionListener");
+		// This is the actionPerformed method for technique (3)
 	}
 	
     private JLabel  baseLabel;
@@ -59,7 +67,7 @@ public class MyJFrame extends JFrame implements ActionListener {
     public MyJFrame() {
 		super("Compute Area Of Triangle, My Friends"); // superclass constructor sets the title
 
-		setLayout(new GridLayout(4,2)); // rows, columns
+		setLayout(new GridLayout(5,2)); // rows, columns
 		
 		FontUIResource fbold = new FontUIResource(Font.SANS_SERIF,Font.BOLD,24);
 		FontUIResource fplain = new FontUIResource(Font.SANS_SERIF,Font.PLAIN,24);
@@ -94,12 +102,36 @@ public class MyJFrame extends JFrame implements ActionListener {
 		JLabel extraStupidField = new JLabel("This is dumb");
 		add(extraStupidField);
 		
-		JButton extraButton = new JButton("This is a dumb button");
+		JButton extraButton = new JButton("I am own actionListener");
 		add(extraButton);
-		extraButton.addActionListener( this );
+		extraButton.addActionListener( this ); // technique 3
 		
+		JButton extraButton3 = new JButton("This uses inner class");
+		add(extraButton3);
+
+		MyHandler h = new MyHandler();
+		extraButton3.addActionListener( h ); // technique 2
+		 
+		JButton extraButton4 = new JButton("This references another class");
+		add(extraButton4);
+		extraButton4.addActionListener( new SeparateActionListener() ); // technique 3
+
+		// Technique 4
 		
-		
+		JButton extraButton5 = new JButton("This uses anonymous inner class");
+
+		extraButton5.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					System.out.println("This is an anonymous inner clase");
+				}				
+			});
+
+		add(extraButton5);
+
+		JButton extraButton6 = new JButton("Fancy thing");
+		extraButton6.addActionListener((e)->{System.out.println("This is a lambda expression");});
+		add(extraButton6);
+
 		// The only thing we want to wait for is a click on the button
 		
 		MyHandler handler = new MyHandler();
@@ -108,14 +140,17 @@ public class MyJFrame extends JFrame implements ActionListener {
 
     } // MyJFrame
 
-    // inner class 
+    // inner class...  This is technique (2)
 
     private class MyHandler implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
 			
 			// the only thing we are expecting is a button press
-			if (event.getSource()!=computeAreaButton) 
-				return;
+			if (event.getSource()!=computeAreaButton) {
+				System.out.println("An instance of MyHandler was invoked");
+				System.out.println("But the event.getSource() wasn't the " +
+								   "computeAreaButton");								  								  				return;
+			}
 			
 			// So the button was pressed.  Let's validate
 			// that the contents of baseTextField and 
